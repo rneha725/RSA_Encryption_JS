@@ -20,23 +20,27 @@
 
 <body>
         <div class="container mt-4">
-            <div class="row mb-4">
-                <div class="col">
-                    <div class="input-group">
+            <div class="row mb-4 px-3">
+                <p class="px-2">Please select a key size for keys generation:</p>
+                <div class="dropdown">
+                    <button id="key-size" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">512</button>
+                    <div class="dropdown-menu" id="key-size-list">
+                        <h6 class="dropdown-header">Key size(bit)</h6>
+                        <a class="dropdown-item" href="#">512</a>
+                        <a class="dropdown-item" href="#">1024</a>
+                        <a class="dropdown-item" href="#">2048</a>
+                        <a class="dropdown-item" href="#">4096</a>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row mb-4 h-100" height="200px">
+                <div class="col h-100 d-inline-block">
+                    <div class="input-group" >
                         <div class="input-group-prepend">
-                            <div class="dropdown px-2">
-                                <button id="key-size" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">512</button>
-                                <div class="dropdown-menu" id="key-size-list">
-                                    <h6 class="dropdown-header">Key size(bit)</h6>
-                                    <a class="dropdown-item" href="#">512</a>
-                                    <a class="dropdown-item" href="#">1024</a>
-                                    <a class="dropdown-item" href="#">2048</a>
-                                    <a class="dropdown-item" href="#">4096</a>
-                                </div>
-                            </div>
                             <span class="input-group-text">Private Key</span>
                         </div>
-                        <textarea id="privkey"class="form-control" aria-label="With textarea"></textarea>
+                        <textarea rows="10" id="privkey"class="form-control" aria-label="With textarea"></textarea>
 
                         <div class="input-group-append">
                         </div>
@@ -48,7 +52,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Public Key</span>
                         </div>
-                        <textarea class="form-control" id="pubkey" disabled>-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJCNTRQLKjwhMc/MNOkxufjdsatlPxMyZQFxyqc6LBL1B+66tXrO8xUT/qGq8nlt+iBSeL0BlN3RsFM93WYGImsCAwEAAQ==
+                        <textarea class="form-control" rows="10" id="pubkey" disabled>-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJCNTRQLKjwhMc/MNOkxufjdsatlPxMyZQFxyqc6LBL1B+66tXrO8xUT/qGq8nlt+iBSeL0BlN3RsFM93WYGImsCAwEAAQ==
 -----END PUBLIC KEY-----</textarea>
                     </div>
                 </div>
@@ -90,21 +94,35 @@
                 });
 
                 $('#encrypt').click(function () {
-                 var encrypt = new JSEncrypt();
-                 encrypt.setPrivateKey($('#privkey').val());
-                 var pubkey = $('#pubkey').val();
-                 if (!pubkey) {
-                     $('#pubkey').val(crypt.getPublicKey());
-                 }
-                 var input = $('#input').val();
-                 var encrypted = $('#encrypted').val();
-                 if (input) {
-                     $('#encrypted').val(encrypt.encrypt(input));
-                 }
-                //  if (!decrypted)
-                //      decrypted = 'This is a test!';
-             });
-
+                    var encrypt = new JSEncrypt();
+                    encrypt.setPrivateKey($('#privkey').val());
+                    var pubkey = $('#pubkey').val();
+                    if (!pubkey) {
+                        $('#pubkey').val(crypt.getPublicKey());
+                    }
+                    var input = $('#input').val();
+                    var encrypted = $('#encrypted').val();
+                    if (input) {
+                        $('#encrypted').val(encrypt.encrypt(input));
+                    }
+                    $('#input').val("");
+                });
+                
+                $("#decrypt").click(function() {
+                    var encrypt = new JSEncrypt();
+                    encrypt.setPrivateKey($('#privkey').val());
+                    var pubkey = $('#pubkey').val();
+                    if (!pubkey) {
+                        $('#pubkey').val(crypt.getPublicKey());
+                    }
+                    var encrypted = $('#encrypted').val();
+                    var input = $('#input').val();
+                    console.log(encrypted)
+                    if (encrypted) {
+                        $('#input').val(encrypt.decrypt(encrypted));
+                    }
+                    $('#encrypted').val("");
+                });
 
             var generateKeys = function () {
             $('#privkey').prop("disabled", true);
