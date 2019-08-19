@@ -14,10 +14,12 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/2.3.1/jsencrypt.min.js">
+    </script>
 </head>
 
 <body>
-        <div class="container mt-4 mx-2">
+        <div class="container mt-4">
             <div class="row mb-4">
                 <div class="col">
                     <div class="input-group">
@@ -25,33 +27,29 @@
                             <div class="dropdown px-2">
                                 <button id="key-size" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">512</button>
                                 <div class="dropdown-menu" id="key-size-list">
-                                    <h6 class="dropdown-header">Key size</h6>
+                                    <h6 class="dropdown-header">Key size(bit)</h6>
                                     <a class="dropdown-item" href="#">512</a>
                                     <a class="dropdown-item" href="#">1024</a>
                                     <a class="dropdown-item" href="#">2048</a>
                                     <a class="dropdown-item" href="#">4096</a>
                                 </div>
                             </div>
-                            <button id="generate-key" class="btn btn-primary" type="button">Generate Private Key</button>
+                            <span class="input-group-text">Private Key</span>
                         </div>
-                        <textarea class="form-control" aria-label="With textarea"></textarea>
+                        <textarea id="privkey"class="form-control" aria-label="With textarea"></textarea>
 
                         <div class="input-group-append">
-                            <div>
-                                
-                            </div>
                         </div>
 
                     </div>
                 </div>
-            </div>
-            <div class="row mb-4">
                 <div class="col">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">Public Key</span>
                         </div>
-                        <textarea class="form-control" disabled></textarea>
+                        <textarea class="form-control" id="pubkey" disabled>-----BEGIN PUBLIC KEY-----MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJCNTRQLKjwhMc/MNOkxufjdsatlPxMyZQFxyqc6LBL1B+66tXrO8xUT/qGq8nlt+iBSeL0BlN3RsFM93WYGImsCAwEAAQ==
+-----END PUBLIC KEY-----</textarea>
                     </div>
                 </div>
             </div>
@@ -59,9 +57,9 @@
                 <div class="col">
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">Enter Text to be encrypted</span>
+                            <button id="encrypt" class="btn btn-primary" type="button">Encrypt Text</button>
                         </div>
-                        <textarea class="form-control"></textarea>
+                        <textarea class="form-control" id="input">This is a test.</textarea>
                     </div>
                 </div>
             </div>
@@ -69,9 +67,9 @@
                 <div class="col">
                     <div class="input-group">
                         <div class="input-group-prepend">
-                            <span class="input-group-text">Encrypted Text</span>
+                            <button id="decrypt" class="btn btn-primary" type="button">Decrypt Text</button>
                         </div>
-                        <textarea class="form-control" disabled></textarea>
+                        <textarea id="encrypted" class="form-control" disabled></textarea>
                     </div>
                 </div>
             </div>
@@ -81,21 +79,69 @@
                 $(".dropdown-menu").on('click', 'a', function () {
                     $("#key-size").text($(this).text());
                     $("#key-size").val($(this).text());
+                    generateKeys()
                 });
-
-                //++++++++++++
-
-                
-
                 $("#key-size-list").on('click', 'a', function () {
                     
                 });
                 
                 $("#generate-key").on("click", function(){
-                    console.log("get the key size");
-                    let keysize = $("#key-size").text();
-                    console.log(keysize);
-                })
+                    generateKeys();
+                });
+
+                $('#encrypt').click(function () {
+                 var encrypt = new JSEncrypt();
+                 encrypt.setPrivateKey($('#privkey').val());
+                 var pubkey = $('#pubkey').val();
+                 if (!pubkey) {
+                     $('#pubkey').val(crypt.getPublicKey());
+                 }
+                 var input = $('#input').val();
+                 var encrypted = $('#encrypted').val();
+                 if (input) {
+                     $('#encrypted').val(encrypt.encrypt(input));
+                 }
+                //  if (!decrypted)
+                //      decrypted = 'This is a test!';
+             });
+
+
+            var generateKeys = function () {
+            $('#privkey').prop("disabled", true);
+            $('#privkey').val("Generating...");
+            console.log("Generating...");
+            var sKeySize = $('#key-size').text();
+            var keySize = parseInt(sKeySize);
+            var encrypt = new JSEncrypt({ default_key_size: keySize });
+
+            //  var async = $('#async-ck').is(':checked');
+                var dt = new Date();
+                var time = -(dt.getTime());
+                if (false) {
+                    $('#time-report').text('.');
+                    var load = setInterval(function () {
+                        var text = $('#time-report').text();
+                        $('#time-report').text(text + '.');
+                    }, 500);
+                    crypt.getKey(function () {
+                        clearInterval(load);
+                        dt = new Date();
+                        time += (dt.getTime());
+                        $('#time-report').text('Generated in ' + time + ' ms');
+                        $('#privkey').val(crypt.getPrivateKey());
+                        $('#pubkey').val(crypt.getPublicKey());
+                    });
+                    return;
+                }
+                
+                encrypt.getKey();
+                dt = new Date();
+                time += (dt.getTime());
+            //  $('#time-report').text('Generated in ' + time + ' ms');
+                $('#privkey').val(encrypt.getPrivateKey());
+                $('#pubkey').val(encrypt.getPublicKey());
+                $('#privkey').prop("disabled", false);
+            };
 
             });
     </script>
